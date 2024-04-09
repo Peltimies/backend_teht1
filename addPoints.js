@@ -1,9 +1,9 @@
 const Dbmethods = require('./Dbmethods');
-
+const conn = require('./dbconnection');
 const studentcode = 'ac9194';
-const addedpoints = 5;
+const pointsToAdd = 5;
 
-Dbmethods.addPoints(studentcode, addedpoints, (err, result) => {
+Dbmethods.addPoints(studentcode, pointsToAdd, (err, result) => {
   if (err) {
     //tämä on addpoints metodin rollback eli se perutetaan tällä
     return conn.rollback(() => {
@@ -21,7 +21,8 @@ Dbmethods.addPoints(studentcode, addedpoints, (err, result) => {
   console.log(
     result.affectedRows +
       ' ' +
-      addedpoints +
+      pointsToAdd +
       ' points added, transaction success'
   );
 });
+module.exports = pointsToAdd;

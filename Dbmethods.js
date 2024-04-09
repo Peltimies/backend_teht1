@@ -17,16 +17,106 @@ const Dbmethods = {
     return conn.query('select * from Students where studypoints < ?', callback);
   },
 
-  addGrade(studentcode, coursecode, grade, callback) {
-    return conn.beginTransaction(function (err) {
+  /*
+      addPoints(studentcode, (error) => {
+        if (error) {
+          conn.rollback(() => {
+            throw new Error(error);
+          });
+        }
+      });
+      conn.commit((error) => {
+        if (error) {
+          conn.rollback(() => {
+            throw new Error(error);
+          });
+        }
+      });
+      console.log('Success!');
+    });
   },
-  addPoints(studentcode, addedpoints, conn) {
+*/
+
+  addPoints(studentcode, pointsToAdd, callback) {
     return conn.query(
-      'update Students set studypoints = ? where studentcode = ?',
-      [studentcode, addedpoints],
+      'update Students set studypoints = studypoints + ?, where studentcode = ?',
+      [pointsToAdd, studentcode],
       callback
     );
   },
+
+  addGrade(studentcode, coursecode, grade, pointsToAdd, callback) {
+    return conn.beginTransaction(function (err) {
+      if (err) {
+        return callback(err, null);
+      }
+      conn.query(
+        'INSERT INTO Grades SET studentcode = ?, grade = ?, coursecode = ?',
+        [studentcode, grade, coursecode],
+        (error, result) => {
+          if (error) {
+            return conn.rollback(() => {
+              throw new Error(error);
+            });
+          }
+          callback(result);
+        }
+      );
+
+      addPoints(studentcode, pointsToAdd, (error) => {
+        if (error) {
+          conn.rollback(() => {
+            throw new Error(error);
+          });
+        }
+      });
+      conn.commit((error) => {
+        if (error) {
+          conn.rollback(() => {
+            throw new Error(error);
+          });
+        }
+      });
+      console.log('Success!');
+    });
+  },
+  /*
+  addGrade(studentcode, coursecode, grade, callback) {
+    return conn.beginTransaction(function (err) {
+      if (err) {
+        return callback(err, null);
+      }
+      conn.query(
+        'INSERT INTO Grades SET studentcode = ?, grade = ?, coursecode = ?',
+        [studentcode, grade, coursecode],
+        (error, result) => {
+          if (error) {
+            return conn.rollback(() => {
+              throw new Error(error);
+            });
+          }
+          callback(result);
+        }
+      );
+
+      this.addPoints(studentcode, (error) => {
+        if (error) {
+          conn.rollback(() => {
+            throw new Error(error);
+          });
+        }
+      });
+      conn.commit((error) => {
+        if (error) {
+          conn.rollback(() => {
+            throw new Error(error);
+          });
+        }
+      });
+      console.log('Success!');
+    });
+  },
+*/
 
   del(studentcode, name, email, studypoints, callback) {
     return conn.query(
