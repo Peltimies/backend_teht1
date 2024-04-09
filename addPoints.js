@@ -18,11 +18,6 @@ Dbmethods.addPoints(studentcode, pointsToAdd, (err, result) => {
       });
     }
   });
-  console.log(
-    result.affectedRows +
-      ' ' +
-      pointsToAdd +
-      ' points added, transaction success'
-  );
+  console.log(`Added ${pointsToAdd} points to ${studentcode} successfully`);
+  process.exit(0);
 });
-module.exports = pointsToAdd;

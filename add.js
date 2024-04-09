@@ -17,6 +17,6 @@ Dbmethods.add(studentcode, name, email, studypoints, function (err, result) {
   if (err) {
     return handleError(err);
   }
-  console.log(result);
-  return result;
+  console.log(`Added Student: ${name}`);
+  process.exit(0);
 });

@@ -36,5 +36,39 @@ describe('Testing mysql', () => {
       done();
     });
   });
-});
 
+  it('should add grade to test database', (done) => {
+    Dbmethods.addGrade('x1234', 'HTS1008', 5, (err, grades) => {
+      if (err) {
+        throw err;
+      }
+      if (grades.length === 0) {
+        throw new Error('No grades in database!');
+      }
+      expect(grades[grades.length - 1]).to.have.property('studentcode');
+      expect(grades[grades.length - 1].studentcode).to.equal('x1234');
+      expect(grades[grades.length - 1]).to.have.property('coursecode');
+      expect(grades[grades.length - 1].studentcode).to.equal('HTS1008');
+      expect(grades[grades.length - 1]).to.have.property('grade');
+      expect(grades[grades.length - 1].studentcode).to.equal(5);
+      done();
+
+      // Now, you can check if the grade has been added by querying the database
+      // and verifying the result. This depends on how your database schema is structured.
+    });
+  });
+  /*
+  it('should delete grade from test database', (done) => {
+    Dbmethods.deleteGrade('x1234', (err, grade) => {
+      if (err) {
+        throw err;
+      }
+      expect(result).to.not.exist;
+      done();
+
+      // Now, you can check if the grade has been added by querying the database
+      // and verifying the result. This depends on how your database schema is structured.
+    });
+  });
+  */
+});

@@ -4,7 +4,7 @@ const conn = require('./dbconnection');
 const Dbmethods = {
   add(studentcode, name, email, studypoints, callback) {
     return conn.query(
-      'insert into Students set studentcode = ?, name = ?, email = ?, studypoints = ?',
+      'INSERT INTO Students set studentcode = ?, name = ?, email = ?, studypoints = ?',
       [studentcode, name, email, studypoints],
       callback
     );
@@ -13,114 +13,33 @@ const Dbmethods = {
   findAll(callback) {
     return conn.query('select * from Students', callback);
   },
-  findBel100: function (callback) {
-    return conn.query('select * from Students where studypoints < ?', callback);
-  },
-
-  /*
-      addPoints(studentcode, (error) => {
-        if (error) {
-          conn.rollback(() => {
-            throw new Error(error);
-          });
-        }
-      });
-      conn.commit((error) => {
-        if (error) {
-          conn.rollback(() => {
-            throw new Error(error);
-          });
-        }
-      });
-      console.log('Success!');
-    });
-  },
-*/
-
-  addPoints(studentcode, pointsToAdd, callback) {
+  findBel(below, callback) {
     return conn.query(
-      'update Students set studypoints = studypoints + ?, where studentcode = ?',
+      'SELECT * FROM Students where studypoints < ?',
+      [below],
+      callback
+    );
+  },
+
+  addGrade(studentcode, coursecode, grade, callback) {
+    return conn.query(
+      'INSERT INTO Grades SET studentcode = ?, grade = ?, coursecode = ?',
+      [studentcode, grade, coursecode],
+      callback
+    );
+  },
+
+  updatePoints(studentcode, pointsToAdd, callback) {
+    return conn.query(
+      'UPDATE Students SET studypoints = studypoints + ? WHERE studentcode = ?',
       [pointsToAdd, studentcode],
       callback
     );
   },
 
-  addGrade(studentcode, coursecode, grade, pointsToAdd, callback) {
-    return conn.beginTransaction(function (err) {
-      if (err) {
-        return callback(err, null);
-      }
-      conn.query(
-        'INSERT INTO Grades SET studentcode = ?, grade = ?, coursecode = ?',
-        [studentcode, grade, coursecode],
-        (error, result) => {
-          if (error) {
-            return conn.rollback(() => {
-              throw new Error(error);
-            });
-          }
-          callback(result);
-        }
-      );
-
-      addPoints(studentcode, pointsToAdd, (error) => {
-        if (error) {
-          conn.rollback(() => {
-            throw new Error(error);
-          });
-        }
-      });
-      conn.commit((error) => {
-        if (error) {
-          conn.rollback(() => {
-            throw new Error(error);
-          });
-        }
-      });
-      console.log('Success!');
-    });
-  },
-  /*
-  addGrade(studentcode, coursecode, grade, callback) {
-    return conn.beginTransaction(function (err) {
-      if (err) {
-        return callback(err, null);
-      }
-      conn.query(
-        'INSERT INTO Grades SET studentcode = ?, grade = ?, coursecode = ?',
-        [studentcode, grade, coursecode],
-        (error, result) => {
-          if (error) {
-            return conn.rollback(() => {
-              throw new Error(error);
-            });
-          }
-          callback(result);
-        }
-      );
-
-      this.addPoints(studentcode, (error) => {
-        if (error) {
-          conn.rollback(() => {
-            throw new Error(error);
-          });
-        }
-      });
-      conn.commit((error) => {
-        if (error) {
-          conn.rollback(() => {
-            throw new Error(error);
-          });
-        }
-      });
-      console.log('Success!');
-    });
-  },
-*/
-
-  del(studentcode, name, email, studypoints, callback) {
+  del(studentcode, callback) {
     return conn.query(
-      'delete from Students WHERE studentcode = ?',
+      'DELETE from Students WHERE studentcode = ?',
       [studentcode],
       callback
     );
@@ -132,10 +51,10 @@ const Dbmethods = {
       callback
     );
   },
-  updateGrade(studentcode, studypoints, callback) {
+  updateGrade(studentcode, coursecode, newgrade, callback) {
     return conn.query(
-      'update Students set studypoints = ? WHERE studentcode = ?',
-      [studentcode, studypoints],
+      'UPDATE Grades SET grade = ? WHERE studentcode = ? AND coursecode = ?',
+      [newgrade, studentcode, coursecode],
       callback
     );
   },

@@ -1,2 +1,1 @@
-
-      Dbmethods.updateGrade(studentcode, pointsToAdd, (err, result) => {
+process.exit(0);

@@ -13,10 +13,13 @@ function handleError(err) {
   process.exit(1);
 }
 
-Dbmethods.del(studentcode, name, email, studypoints, function (err, result) {
+Dbmethods.del(studentcode, function (err) {
   if (err) {
     return handleError(err);
   }
-  console.log(result);
-  return result;
+
+  console.log(
+    `Deleted data from: ${studentcode}, ${name}, ${email}. With a studypoint count of: ${studypoints}`
+  );
+  process.exit(0);
 });

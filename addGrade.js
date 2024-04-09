@@ -2,8 +2,8 @@ const Dbmethods = require('./Dbmethods');
 
 const conn = require('./dbconnection');
 const studentcode = 'ac9194';
-const coursecode = 'HTS1005';
-const newgrade = 3;
+const coursecode = 'HTS1008';
+const newgrade = 5;
 const pointsToAdd = 5;
 
 if (newgrade > 0) {
@@ -12,42 +12,41 @@ if (newgrade > 0) {
     if (err) {
       throw err;
     }
-    Dbmethods.addGrade(
-      studentcode,
-      coursecode,
-      newgrade,
-      pointsToAdd,
-      (err, result) => {
+    console.log(`Adding ${studentcode}'s grade ${newgrade} to ${coursecode}`);
+
+    // Add the grade
+    Dbmethods.addGrade(studentcode, coursecode, newgrade, (err, result) => {
+      if (err) {
+        return conn.rollback(() => {
+          throw err;
+        });
+      }
+      console.log(`Added ${studentcode}'s grade ${newgrade} to ${coursecode}`);
+      // Update the points
+      Dbmethods.updatePoints(studentcode, pointsToAdd, (err) => {
         if (err) {
           return conn.rollback(() => {
-            // rollback = Transaktio perutaan
             throw err;
           });
         }
 
-        Dbmethods.updateGrade(studentcode, pointsToAdd, (err, result) => {
+        console.log(
+          `Updated ${studentcode}'s studypoints with ${pointsToAdd} points`
+        );
+
+        // Commit the transaction
+        conn.commit((err) => {
           if (err) {
             return conn.rollback(() => {
               throw err;
             });
           }
-          conn.commit(function (err) {
-            if (err) {
-              return conn.rollback(() => {
-                throw err;
-              });
-            }
-            console.log('Grade added, student updated!');
-          });
+          console.log(
+            `Added ${pointsToAdd} studypoints to ${studentcode} successfully`
+          );
+          process.exit(0);
         });
-      }
-    );
-  });
-} else {
-  Dbmethods.addGrade(studentcode, coursecode, newgrade, (err, result) => {
-    if (err) {
-      throw err;
-    }
-    return result;
+      });
+    });
   });
 }

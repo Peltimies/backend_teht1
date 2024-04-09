@@ -10,5 +10,5 @@ Dbmethods.findAll(function (err, result) {
     return handleError(err);
   }
   console.log(result);
-  return result;
+  process.exit(0);
 });
